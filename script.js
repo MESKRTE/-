@@ -265,7 +265,8 @@ const elements = {
     charImgInput: document.getElementById('char-img-input'),
     charImgPreview: document.getElementById('char-img-preview'),
     charImgUploadBtn: document.getElementById('char-img-upload'),
-    charImgClearBtn: document.getElementById('char-img-clear')
+    charImgClearBtn: document.getElementById('char-img-clear'),
+    publishBtn: document.getElementById('publish-btn')
 };
 
 // Initialization
@@ -282,6 +283,7 @@ function init() {
     elements.saveBtn.addEventListener('click', saveData);
     elements.loadBtn.addEventListener('click', () => elements.loadFile.click());
     elements.loadFile.addEventListener('change', loadData);
+    elements.publishBtn.addEventListener('click', publishData);
 
     // Initial Render
     updateUI();
@@ -954,6 +956,47 @@ function loadData(event) {
 
     // Reset file input so same file can be loaded again if needed
     event.target.value = '';
+}
+
+function publishData() {
+    // 必須項目が埋まっているかチェック
+    if (!state.selections.limitLevel || !state.selections.origin || !state.selections.ability) {
+        alert("公開するには、最低でも「限界レベル」「出身」「能力値」を設定してください。");
+        return;
+    }
+
+    const charName = prompt("公開するキャラクターの名前を入力してください（空欄でも可）", "名無し");
+    if (charName === null) return; // キャンセル
+
+    const data = {
+        id: "char_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+        name: charName || "名無し",
+        timestamp: new Date().toISOString(),
+        state: state
+    };
+
+    const gasUrl = "https://script.google.com/macros/s/AKfycbyJDSVse4RXvoN_pZPRvsNqnliFS2mm83FDT7ZGpI2XWkNF50ZC9aco4mWBhZ20E2g/exec";
+    
+    const originalText = elements.publishBtn.textContent;
+    elements.publishBtn.textContent = "公開中...";
+    elements.publishBtn.disabled = true;
+
+    fetch(gasUrl, {
+        method: 'POST',
+        body: new URLSearchParams({ payload: JSON.stringify(data) })
+    })
+    .then(response => response.json())
+    .then(result => {
+        elements.publishBtn.textContent = originalText;
+        elements.publishBtn.disabled = false;
+        alert("ギャラリーに公開しました！");
+    })
+    .catch(error => {
+        console.error(error);
+        elements.publishBtn.textContent = originalText;
+        elements.publishBtn.disabled = false;
+        alert("公開に失敗しました。時間をおいて再試行してください。");
+    });
 }
 
 // Run
