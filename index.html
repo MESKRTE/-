@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オーバーロード「あなたの分身」作成ツール</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <h1>オーバーロード「あなたの分身」作成ツール</h1>
+            <p>
+                元ネタサイト：<a href="https://overlord-anime.com/_season4/10th-anniv/"
+                    target="_blank">「あなたの分身がオーバーロード世界にいたら」（オーバーロードアニメ公式サイト）</a>
+            </p>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Panel -->
+            <div class="left-panel">
+                <section class="character-image-section">
+                    <div class="image-preview-container" onclick="document.getElementById('char-img-input').click()">
+                        <div class="image-placeholder">画像を選択</div>
+                        <img id="char-img-preview" src="" style="display:none;" alt="Character Image">
+                    </div>
+                    <input type="file" id="char-img-input" accept="image/*" style="display: none;">
+                    <div class="image-controls">
+                        <button id="char-img-upload" class="btn secondary small">変更</button>
+                        <button id="char-img-clear" class="btn secondary small">削除</button>
+                    </div>
+                </section>
+
+                <section class="controls">
+                    <div style="display: flex; gap: 5px;">
+                        <button id="save-btn" class="btn secondary" style="flex: 1;">保存 (.json)</button>
+                        <button id="load-btn" class="btn secondary" style="flex: 1;">読込 (.json)</button>
+                    </div>
+                    <input type="file" id="load-file" accept=".json" style="display: none;">
+                    <div style="margin-top: 8px; border-top: 1px solid #333; padding-top: 8px; display: flex; gap: 5px;">
+                        <button id="publish-btn" class="btn primary" style="flex: 1; font-weight: bold; background-color: #d4af37; color: #000; font-size: 0.8rem; padding: 5px;">公開する</button>
+                        <a href="gallery.html" class="btn" style="flex: 1; text-align: center; text-decoration: none; border: 1px solid #d4af37; color: #d4af37; font-size: 0.8rem; padding: 5px; display: flex; align-items: center; justify-content: center;">ギャラリー</a>
+                    </div>
+                </section>
+
+                <section class="card-pool">
+                    <h2>カード在庫</h2>
+                    <div id="card-stock" class="card-container"></div>
+                    <button id="reset-btn" class="btn primary" style="margin-top: 10px;">全てリセット</button>
+                </section>
+
+                <section class="results">
+                    <h2>ステータス概算</h2>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <span class="label">基礎限界Lv</span>
+                            <span class="value" id="res-base-level">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">出身ボーナス</span>
+                            <span class="value" id="res-bonus-level">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">推定最終Lv</span>
+                            <span class="value highlight" id="res-final-level">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">実効戦闘Lv</span>
+                            <span class="value highlight" id="res-effective-level">-</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Center Panel -->
+            <section class="configuration">
+                <div class="category-block" data-category="limitLevel">
+                    <h3>限界レベル</h3>
+                    <div class="selection-area">
+                        <select class="card-selector" id="sel-limitLevel"></select>
+                        <button class="list-btn" data-category="limitLevel" title="全ランク一覧">📖</button>
+                        <button class="lock-btn" data-category="limitLevel" title="選択をロック（リセット保護）">🔓</button>
+                    </div>
+                    <div class="description-area" id="desc-limitLevel"></div>
+                    <textarea placeholder="自由に設定を記入"></textarea>
+                </div>
+
+                <div class="category-block" data-category="origin">
+                    <h3>出身</h3>
+                    <div class="selection-area">
+                        <select class="card-selector" id="sel-origin"></select>
+                        <button class="list-btn" data-category="origin" title="全ランク一覧">📖</button>
+                        <button class="lock-btn" data-category="origin" title="選択をロック（リセット保護）">🔓</button>
+                    </div>
+                    <div class="description-area" id="desc-origin"></div>
+                    <textarea placeholder="自由に設定を記入"></textarea>
+                </div>
+
+                <div class="category-block" data-category="ability">
+                    <h3>能力値</h3>
+                    <div class="selection-area">
+                        <select class="card-selector" id="sel-ability"></select>
+                        <button class="list-btn" data-category="ability" title="全ランク一覧">📖</button>
+                        <button class="lock-btn" data-category="ability" title="選択をロック（リセット保護）">🔓</button>
+                    </div>
+                    <div class="description-area" id="desc-ability"></div>
+                    <textarea placeholder="自由に設定を記入"></textarea>
+                </div>
+
+                <div class="category-block" data-category="item">
+                    <h3>特殊アイテム</h3>
+                    <div class="selection-area">
+                        <select class="card-selector" id="sel-item"></select>
+                        <button class="list-btn" data-category="item" title="全ランク一覧">📖</button>
+                        <button class="lock-btn" data-category="item" title="選択をロック（リセット保護）">🔓</button>
+                    </div>
+                    <div class="description-area" id="desc-item"></div>
+                    <textarea placeholder="自由に設定を記入"></textarea>
+                </div>
+
+                <div class="category-block" data-category="talent">
+                    <h3>タレント</h3>
+                    <div class="selection-area">
+                        <select class="card-selector" id="sel-talent"></select>
+                        <button class="list-btn" data-category="talent" title="全ランク一覧">📖</button>
+                        <button class="lock-btn" data-category="talent" title="選択をロック（リセット保護）">🔓</button>
+                    </div>
+                    <div class="description-area" id="desc-talent"></div>
+                    <textarea placeholder="自由に設定を記入"></textarea>
+                </div>
+
+                <div class="category-block" data-category="connection">
+                    <h3>コネクション</h3>
+                    <div class="selection-area">
+                        <select class="card-selector" id="sel-connection"></select>
+                        <button class="list-btn" data-category="connection" title="全ランク一覧">📖</button>
+                        <button class="lock-btn" data-category="connection" title="選択をロック（リセット保護）">🔓</button>
+                    </div>
+                    <div class="description-area" id="desc-connection"></div>
+                    <textarea placeholder="自由に設定を記入"></textarea>
+                </div>
+            </section>
+
+            <!-- Right Panel -->
+            <div class="right-panel">
+                <section class="last-boss">
+                    <h2>ラスボス決定</h2>
+                    <p style="font-size:0.8rem; margin:0 0 10px; color:#aaa;">サイコロを振って運命を決定</p>
+                    <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+                        <button id="roll-boss-btn" class="btn primary">運命のダイス (2d6)</button>
+                        <button id="no-boss-btn" class="btn"
+                            style="background:#444; color:#ccc; font-size:0.9rem;">🚫</button>
+                        <button class="list-btn" data-category="boss" title="全結果一覧">📖</button>
+                        <button class="lock-btn" data-category="boss" title="結果をロック（リセット保護）">🔓</button>
+                    </div>
+                    <div id="boss-result" class="boss-result-area"></div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div id="detail-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h3 id="modal-title">詳細</h3>
+                <div id="modal-body"></div>
+            </div>
+        </div>
+
+
+
+        <footer>
+            <p>&copy; 2026 Overlord Alter Ego Generator Tool / Original Idea by Maruyama Kugane</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
